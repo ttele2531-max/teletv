@@ -3,29 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTv | Secure Shell</title>
-    <link rel="manifest" href="04_manifest.json">
-    <script src="03_TeleTv_key.js"></script>
+    <title>TeleTv | Universal Shell</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         :root { --gold: #D4AF37; --charcoal: #121212; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--charcoal); color: white; text-align: center; font-family: 'Segoe UI', sans-serif; }
-        #lock-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; }
-        #tele-logo { width: 300px; margin-bottom: 30px; }
-        .progress-bg { width: 250px; height: 2px; background: rgba(212, 175, 55, 0.1); margin: 20px auto; }
-        #progress-bar { width: 0%; height: 100%; background: var(--gold); transition: width 1s; }
-        #master-btn { display: none; margin-top: 20px; padding: 15px 40px; background: transparent; border: 1px solid var(--gold); color: var(--gold); cursor: pointer; text-transform: uppercase; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--charcoal); color: white; text-align: center; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        #lock-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); }
+        #tele-logo { width: 300px; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)); }
+        #status-text { color: var(--gold); font-size: 11px; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase; font-weight: 600; }
+        
+        /* The Button that will appear on the TV */
+        #master-btn { 
+            display: inline-block; /* We show it by default for the TV setup */
+            margin-top: 30px; padding: 18px 50px; 
+            background: transparent; border: 1px solid var(--gold); 
+            color: var(--gold); cursor: pointer; text-transform: uppercase;
+            letter-spacing: 4px; font-size: 14px; transition: 0.4s;
+        }
+        #master-btn:hover { background: var(--gold); color: black; }
     </style>
 </head>
 <body>
+
     <div id="lock-screen">
         <img src="02_TeleTV_Logo.jpg" id="tele-logo">
-        <div id="status-text">SYSTEM CHECKING...</div>
-        <div class="progress-bg"><div id="progress-bar"></div></div>
-        <button id="master-btn" onclick="installAndLaunch()">Install TeleTv System</button>
+        <div id="status-text">SYSTEM READY</div>
+        <button id="master-btn" onclick="startApp()">Install & Launch TeleTv</button>
     </div>
 
     <script>
-        // REGISTER THE "BRAIN" (Service Worker)
+        // Register the Service Worker (The "Brain")
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
@@ -34,23 +41,17 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            // Key verification logic
-            if (typeof masterKey !== 'undefined' && masterKey.license_status === "Active") {
-                document.getElementById('progress-bar').style.width = "100%";
-                document.getElementById('status-text').innerText = "KEY VERIFIED";
-                document.getElementById('master-btn').style.display = "inline-block";
-            }
         });
 
-        function installAndLaunch() {
-            // 1. Install the "One Icon" on Samsung/LG/Android
+        function startApp() {
+            // 1. Try to add the Gold Icon to the TV/Phone Home Screen
             if (deferredPrompt) {
                 deferredPrompt.prompt();
             }
-            
-            // 2. Launch the Cinema
-            // Replace with your real streaming URL
-            window.location.href = "https://your-streaming-link.com";
+
+            // 2. Launch your Cinema
+            // Replace this with your actual movie portal link
+            window.location.href = "https://your-streaming-link.com"; 
         }
     </script>
 </body>
