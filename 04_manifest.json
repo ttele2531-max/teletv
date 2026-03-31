@@ -1,0 +1,15 @@
+{
+  "short_name": "TeleTv",
+  "name": "TeleTv | Secure Cinema",
+  "icons": [
+    {
+      "src": "02_TeleTV_Logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "start_url": "/01_START_TeleTv.html",
+  "display": "standalone",
+  "theme_color": "#121212",
+  "background_color": "#121212"
+}
