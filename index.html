@@ -9,77 +9,93 @@
             --gold: #D4AF37;
             --dark-gold: #A57A03;
             --bg: #050505;
-            --glass: rgba(255, 255, 255, 0.03);
         }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--bg);
-            background-image: radial-gradient(circle at center, #111 0%, #000 100%);
-            color: white; font-family: 'Segoe UI', Roboto, sans-serif;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            color: white; font-family: 'Segoe UI', sans-serif;
             display: flex; justify-content: center; align-items: center;
             overflow: hidden;
         }
 
         .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 24px;
-            padding: 50px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 30px;
+            padding: 60px 40px;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            max-width: 400px; width: 90%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+            max-width: 420px; width: 90%;
+            transition: all 0.5s ease;
         }
 
         #logo {
-            width: 220px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+            width: 240px;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.2));
+            transition: transform 0.4s ease;
         }
 
-        h2 { color: var(--gold); font-weight: 300; letter-spacing: 2px; margin-bottom: 30px; font-size: 1.2rem; }
+        h2 { 
+            color: var(--gold); 
+            font-weight: 300; 
+            letter-spacing: 4px; 
+            margin-bottom: 35px; 
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
 
         .unlock-btn {
-            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
-            color: black; border: none; padding: 18px 40px;
-            font-size: 1rem; font-weight: bold; text-transform: uppercase;
+            background: linear-gradient(145deg, var(--gold), var(--dark-gold));
+            color: #000; border: none; padding: 20px 45px;
+            font-size: 0.9rem; font-weight: 800; text-transform: uppercase;
             letter-spacing: 2px; border-radius: 50px;
-            cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
         }
 
         .unlock-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
-            filter: brightness(1.1);
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(212, 175, 55, 0.5);
         }
 
+        .unlock-btn:active { transform: scale(0.98); }
+
         #status {
-            margin-top: 25px; font-size: 0.8rem;
-            color: rgba(255,255,255,0.5); letter-spacing: 1px;
+            margin-top: 30px; font-size: 0.75rem;
+            color: rgba(255,255,255,0.4); 
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
+
+        /* Success State */
+        .verified { border-color: #00ff88; box-shadow: 0 0 40px rgba(0, 255, 136, 0.2); }
 
         input[type="file"] { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="glass-card">
+    <div class="glass-card" id="mainCard">
         <img src="02_TeleTV_Logo.jpg" id="logo" alt="TeleTv">
-        <h2>SYSTEM ENCRYPTED</h2>
+        <h2 id="headerText">Hardware Encrypted</h2>
         
         <input type="file" id="keyUpload" accept=".json">
-        <button class="unlock-btn" onclick="document.getElementById('keyUpload').click()">
+        <button class="unlock-btn" id="actionBtn" onclick="document.getElementById('keyUpload').click()">
             Insert NASA Key
         </button>
 
-        <p id="status">Awaiting hardware authorization...</p>
+        <p id="status">Waiting for USB token...</p>
     </div>
 
     <script>
-        const BACKBONE_URL = "https://google.com"; // Put your movie server link here
+        // --- CONFIGURATION ---
+        // Replace this link with your actual movie server address
+        const BACKBONE_URL = "https://google.com"; 
         const REQUIRED_PROTOCOL = "TEL-TV-77-SECURE";
 
         document.getElementById('keyUpload').addEventListener('change', function(e) {
@@ -87,24 +103,43 @@
             if (!file) return;
 
             const reader = new FileReader();
-            document.getElementById('status').innerText = "VERIFYING KEY...";
+            const status = document.getElementById('status');
+            const card = document.getElementById('mainCard');
+            const btn = document.getElementById('actionBtn');
+            const header = document.getElementById('headerText');
+
+            status.innerText = "AUTHENTICATING...";
 
             reader.onload = function(event) {
                 try {
                     const data = JSON.parse(event.target.result);
+                    
                     if (data.handshake_protocol === REQUIRED_PROTOCOL) {
-                        document.getElementById('status').style.color = "#D4AF37";
-                        document.getElementById('status').innerText = "ACCESS GRANTED";
+                        // SUCCESS
+                        card.classList.add('verified');
+                        header.innerText = "ACCESS GRANTED";
+                        header.style.color = "#00ff88";
+                        status.innerText = "HANDSHAKE COMPLETE";
+                        btn.style.display = "none";
                         
                         setTimeout(() => {
-                            window.location.href = BACKBONE_URL;
-                        }, 1000);
+                            card.style.opacity = "0";
+                            card.style.transform = "translateY(-20px)";
+                            setTimeout(() => {
+                                window.location.href = BACKBONE_URL;
+                            }, 500);
+                        }, 1200);
                     } else {
-                        throw new Error("Invalid protocol");
+                        throw new Error("Invalid Key");
                     }
                 } catch (err) {
-                    document.getElementById('status').style.color = "#ff4444";
-                    document.getElementById('status').innerText = "INVALID HARDWARE KEY";
+                    // FAILURE
+                    status.innerText = "INVALID HARDWARE KEY";
+                    status.style.color = "#ff4444";
+                    setTimeout(() => {
+                        status.innerText = "Waiting for USB token...";
+                        status.style.color = "rgba(255,255,255,0.4)";
+                    }, 3000);
                 }
             };
             reader.readAsText(file);
