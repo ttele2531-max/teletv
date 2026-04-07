@@ -3,56 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTv | Universal Shell</title>
-    <link rel="manifest" href="manifest.json">
+    <title>TeleTv | Secure Gateway</title>
     <style>
-        :root { --gold: #D4AF37; --charcoal: #121212; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--charcoal); color: white; text-align: center; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #lock-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); }
-        #tele-logo { width: 300px; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)); }
-        #status-text { color: var(--gold); font-size: 11px; letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase; font-weight: 600; }
+        :root { --gold: #D4AF37; --bg: #000; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* The Button that will appear on the TV */
-        #master-btn { 
-            display: inline-block; /* We show it by default for the TV setup */
-            margin-top: 30px; padding: 18px 50px; 
-            background: transparent; border: 1px solid var(--gold); 
-            color: var(--gold); cursor: pointer; text-transform: uppercase;
-            letter-spacing: 4px; font-size: 14px; transition: 0.4s;
-        }
-        #master-btn:hover { background: var(--gold); color: black; }
+        .container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; }
+        
+        #logo { width: 300px; margin-bottom: 30px; transition: transform 0.5s ease; }
+        
+        .loader-box { width: 280px; }
+        #status { font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .bar-bg { width: 100%; height: 2px; background: #1a1a1a; border-radius: 10px; }
+        #progress-bar { width: 0%; height: 100%; background: var(--gold); box-shadow: 0 0 15px var(--gold); transition: width 0.4s ease; }
+
+        /* Smooth fade out when unlocked */
+        .unlocked { opacity: 0; transform: scale(1.1); transition: 1s ease-out; }
     </style>
 </head>
 <body>
 
-    <div id="lock-screen">
-        <img src="02_TeleTV_Logo.jpg" id="tele-logo">
-        <div id="status-text">SYSTEM READY</div>
-        <button id="master-btn" onclick="startApp()">Install & Launch TeleTv</button>
+    <div class="container" id="gateway">
+        <img src="TeleTv_Logo.png" id="logo" alt="TeleTv Logo">
+        <div class="loader-box">
+            <p id="status">Scanning for Hardware Key...</p>
+            <div class="bar-bg"><div id="progress-bar"></div></div>
+        </div>
     </div>
 
     <script>
-        // Register the Service Worker (The "Brain")
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+        // CONFIGURATION
+        const CINEMA_BACKBONE = "https://YOUR_CINEMA_SERVER_LINK_HERE"; // Put your actual server link here
+        const HANDSHAKE_FILE = "TeleTv_key.json";
+        const REQUIRED_PROTOCOL = "TEL-TV-77-SECURE";
 
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
+        async function attemptHandshake() {
+            const bar = document.getElementById('progress-bar');
+            const statusText = document.getElementById('status');
+            const gateway = document.getElementById('gateway');
 
-        function startApp() {
-            // 1. Try to add the Gold Icon to the TV/Phone Home Screen
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
+            // Paths vary by TV OS (Tizen/webOS/Android)
+            const searchPaths = [
+                HANDSHAKE_FILE,                        // Check local directory
+                `./${HANDSHAKE_FILE}`,                 // Relative check
+                `file:///mnt/usb/sda1/${HANDSHAKE_FILE}`, // Generic TV Mount
+                `file:///dtv/usb/sda1/${HANDSHAKE_FILE}`, // Samsung
+                `file:///mnt/spool/rw/sda/sda1/${HANDSHAKE_FILE}` // LG
+            ];
+
+            for (let path of searchPaths) {
+                try {
+                    const response = await fetch(path);
+                    if (response.ok) {
+                        const keyData = await response.json();
+                        
+                        if (keyData.handshake_protocol === REQUIRED_PROTOCOL) {
+                            // MATCH FOUND
+                            statusText.innerText = "HARDWARE VERIFIED";
+                            bar.style.width = "100%";
+                            
+                            setTimeout(() => {
+                                gateway.classList.add('unlocked');
+                                setTimeout(() => {
+                                    window.location.href = CINEMA_BACKBONE;
+                                }, 800);
+                            }, 1200);
+                            return; // Stop searching
+                        }
+                    }
+                } catch (err) {
+                    // Silently fail and try next path
+                }
             }
 
-            // 2. Launch your Cinema
-            // Replace this with your actual movie portal link
-            window.location.href = "https://your-streaming-link.com"; 
+            // If not found, keep looping every 2 seconds
+            setTimeout(attemptHandshake, 2000);
         }
+
+        // Start the engine
+        window.onload = attemptHandshake;
     </script>
 </body>
 </html>
