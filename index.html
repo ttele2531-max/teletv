@@ -7,25 +7,19 @@
     <style>
         :root { --gold: #D4AF37; --bg: #000; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
         .container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; }
-        
         #logo { width: 300px; margin-bottom: 30px; transition: transform 0.5s ease; }
-        
         .loader-box { width: 280px; }
         #status { font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-bottom: 10px; text-transform: uppercase; }
-        
         .bar-bg { width: 100%; height: 2px; background: #1a1a1a; border-radius: 10px; }
         #progress-bar { width: 0%; height: 100%; background: var(--gold); box-shadow: 0 0 15px var(--gold); transition: width 0.4s ease; }
-
-        /* Smooth fade out when unlocked */
         .unlocked { opacity: 0; transform: scale(1.1); transition: 1s ease-out; }
     </style>
 </head>
 <body>
 
     <div class="container" id="gateway">
-        <img src="TeleTv_Logo.png" id="logo" alt="TeleTv Logo">
+        <img src="02_TeleTV_Logo.jpg" id="logo" alt="TeleTv Logo">
         <div class="loader-box">
             <p id="status">Scanning for Hardware Key...</p>
             <div class="bar-bg"><div id="progress-bar"></div></div>
@@ -33,9 +27,9 @@
     </div>
 
     <script>
-        // CONFIGURATION
-        const CINEMA_BACKBONE = "https://YOUR_CINEMA_SERVER_LINK_HERE"; // Put your actual server link here
-        const HANDSHAKE_FILE = "TeleTv_key.json";
+        // CONFIGURATION - LINKED TO YOUR SCREENSHOTS
+        const CINEMA_BACKBONE = "https://google.com"; // Replace this with your actual movie server link later
+        const HANDSHAKE_FILE = "TeleTv_key.json"; 
         const REQUIRED_PROTOCOL = "TEL-TV-77-SECURE";
 
         async function attemptHandshake() {
@@ -43,13 +37,13 @@
             const statusText = document.getElementById('status');
             const gateway = document.getElementById('gateway');
 
-            // Paths vary by TV OS (Tizen/webOS/Android)
+            // Paths for Samsung (Tizen), LG (webOS), and Android/PC
             const searchPaths = [
-                HANDSHAKE_FILE,                        // Check local directory
-                `./${HANDSHAKE_FILE}`,                 // Relative check
-                `file:///mnt/usb/sda1/${HANDSHAKE_FILE}`, // Generic TV Mount
-                `file:///dtv/usb/sda1/${HANDSHAKE_FILE}`, // Samsung
-                `file:///mnt/spool/rw/sda/sda1/${HANDSHAKE_FILE}` // LG
+                HANDSHAKE_FILE,                        
+                `./${HANDSHAKE_FILE}`,                 
+                `file:///mnt/usb/sda1/${HANDSHAKE_FILE}`, 
+                `file:///dtv/usb/sda1/${HANDSHAKE_FILE}`, 
+                `file:///mnt/spool/rw/sda/sda1/${HANDSHAKE_FILE}`
             ];
 
             for (let path of searchPaths) {
@@ -59,7 +53,6 @@
                         const keyData = await response.json();
                         
                         if (keyData.handshake_protocol === REQUIRED_PROTOCOL) {
-                            // MATCH FOUND
                             statusText.innerText = "HARDWARE VERIFIED";
                             bar.style.width = "100%";
                             
@@ -69,19 +62,14 @@
                                     window.location.href = CINEMA_BACKBONE;
                                 }, 800);
                             }, 1200);
-                            return; // Stop searching
+                            return; 
                         }
                     }
-                } catch (err) {
-                    // Silently fail and try next path
-                }
+                } catch (err) { }
             }
-
-            // If not found, keep looping every 2 seconds
-            setTimeout(attemptHandshake, 2000);
+            setTimeout(attemptHandshake, 2000); // Keep scanning
         }
 
-        // Start the engine
         window.onload = attemptHandshake;
     </script>
 </body>
