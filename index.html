@@ -4,113 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeleTv Pro | Secure Vault</title>
-    <link rel="manifest" href="manifest.json">
     <style>
-        :root { --gold: #D4AF37; --bg: #000; --glass: rgba(255,255,255,0.03); }
-        body, html { margin: 0; padding: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100%; display: flex; justify-content: center; align-items: center; text-align: center; overflow: hidden; }
-        
-        .vault-card { 
-            width: 90%; max-width: 400px; padding: 50px 30px; 
-            border: 1px solid rgba(212,175,55,0.2); border-radius: 40px; 
-            background: var(--glass); backdrop-filter: blur(20px);
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-        }
-
-        #logo { width: 220px; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(212,175,55,0.4)); }
-        h2 { font-weight: 200; letter-spacing: 5px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
-        p { color: #555; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 40px; }
-
-        .sync-btn { 
-            background: var(--gold); color: black; border: none; padding: 22px; border-radius: 60px; 
-            font-weight: 900; cursor: pointer; text-transform: uppercase; width: 100%; font-size: 0.9rem; 
-            letter-spacing: 2px; transition: 0.3s; box-shadow: 0 15px 30px rgba(212,175,55,0.15);
-        }
-        .sync-btn:active { transform: scale(0.98); }
-
-        #command-center { display: none; margin-top: 20px; }
-        .launch-btn { 
-            display: block; background: rgba(255,255,255,0.05); color: var(--gold); 
-            border: 1px solid var(--gold); padding: 15px; margin-bottom: 10px; 
-            border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 0.8rem;
-            transition: 0.3s; text-transform: uppercase;
-        }
-        .launch-btn:hover { background: var(--gold); color: black; }
-
-        #status { margin-top: 25px; font-size: 0.75rem; color: #888; text-transform: uppercase; min-height: 1.2em; }
-        input[type="file"] { display: none; }
+        :root { --gold: #D4AF37; --bg: #000; }
+        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; text-align: center; }
+        .vault-card { width: 90%; max-width: 400px; padding: 40px; border: 1px solid rgba(212,175,55,0.3); border-radius: 30px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
+        #logo { width: 200px; margin-bottom: 20px; }
+        .btn { display: block; background: var(--gold); color: black; padding: 20px; margin-top: 20px; border-radius: 50px; text-decoration: none; font-weight: bold; text-transform: uppercase; border: none; width: 100%; cursor: pointer; }
+        #command-center { display: none; }
+        #status { margin-top: 20px; font-size: 0.8rem; color: #888; }
     </style>
 </head>
 <body>
 
 <div class="vault-card">
-    <img src="02_TeleTV_Logo.jpg" id="logo" alt="TeleTv Logo">
+    <img src="02_TeleTV_Logo.jpg" id="logo">
     
     <div id="auth-ui">
-        <h2>Vault Locked</h2>
-        <p>Hardware Security Handshake Required</p>
-        <input type="file" id="keyFile" accept=".json">
-        <button class="sync-btn" onclick="document.getElementById('keyFile').click()">Sync NASA Key</button>
+        <h2>VAULT LOCKED</h2>
+        <p>Sync NASA Key to Proceed</p>
+        <input type="file" id="keyFile" style="display:none">
+        <button class="btn" onclick="document.getElementById('keyFile').click()">SYNC KEY</button>
     </div>
 
     <div id="command-center">
-        <h2 style="font-size: 1.2rem;">Access Granted</h2>
-        <p>Select your engine components below:</p>
-        
-        <div id="android-tools">
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="launch-btn">1. Download Tele-TV Core</a>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="launch-btn">2. Download Dedicated Player</a>
-        </div>
-        
-        <div id="tv-tools" style="display:none;">
-            <a href="https://movies2watch.tv/" class="launch-btn">Launch Web Portal</a>
-        </div>
+        <h2>ACCESS GRANTED</h2>
+        <p>Install HDO Core & Player:</p>
+        <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="btn">1. INSTALL HDO BOX</a>
+        <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="btn">2. INSTALL PLAYER</a>
     </div>
     
-    <div id="status">Awaiting D: Drive Connection...</div>
+    <div id="status">Awaiting Handshake...</div>
 </div>
 
 <script>
     document.getElementById('keyFile').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
         const reader = new FileReader();
-        const statusEl = document.getElementById('status');
-        
-        statusEl.innerText = "Verifying Protocol...";
-        statusEl.style.color = "var(--gold)";
-
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
                 if (data.handshake_protocol === "TEL-TV-77-SECURE") {
                     document.getElementById('auth-ui').style.display = 'none';
                     document.getElementById('command-center').style.display = 'block';
-                    statusEl.innerText = "System Synchronized";
-                    statusEl.style.color = "#00ff88";
-
-                    // Improved Device Detection
-                    const userAgent = navigator.userAgent.toLowerCase();
-                    const isAndroid = /android|fire|sm-/.test(userAgent);
-                    
-                    if (!isAndroid) {
-                        document.getElementById('android-tools').style.display = 'none';
-                        document.getElementById('tv-tools').style.display = 'block';
-                    }
-                } else { throw new Error(); }
+                    document.getElementById('status').innerText = "SYSTEM READY";
+                }
             } catch (err) {
-                statusEl.innerText = "Access Denied: Invalid Key";
-                statusEl.style.color = "#ff4444";
+                document.getElementById('status').innerText = "INVALID KEY";
             }
         };
-        reader.readAsText(file);
+        reader.readAsText(e.target.files[0]);
     });
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-        });
-    }
 </script>
 </body>
 </html>
