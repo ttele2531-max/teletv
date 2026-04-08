@@ -27,7 +27,6 @@
         }
         .sync-btn:active { transform: scale(0.98); }
 
-        /* Command Center Buttons (Hidden until Sync) */
         #command-center { display: none; margin-top: 20px; }
         .launch-btn { 
             display: block; background: rgba(255,255,255,0.05); color: var(--gold); 
@@ -63,7 +62,7 @@
         </div>
         
         <div id="tv-tools" style="display:none;">
-            <a href="https://movies7.to/" class="launch-btn">Launch Web Portal</a>
+            <a href="https://fboxz.to/home" class="launch-btn">Launch Web Portal</a>
         </div>
     </div>
     
@@ -84,25 +83,18 @@
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
-                
-                // Security Check
                 if (data.handshake_protocol === "TEL-TV-77-SECURE") {
-                    
-                    // Switch UI
                     document.getElementById('auth-ui').style.display = 'none';
                     document.getElementById('command-center').style.display = 'block';
                     statusEl.innerText = "System Synchronized";
                     statusEl.style.color = "#00ff88";
 
-                    // Device Detection Logic
                     const isAndroid = /Android|FireCo/i.test(navigator.userAgent);
                     if (!isAndroid) {
                         document.getElementById('android-tools').style.display = 'none';
                         document.getElementById('tv-tools').style.display = 'block';
                     }
-                } else {
-                    throw new Error("Protocol Mismatch");
-                }
+                } else { throw new Error(); }
             } catch (err) {
                 statusEl.innerText = "Access Denied: Invalid Key";
                 statusEl.style.color = "#ff4444";
@@ -111,7 +103,6 @@
         reader.readAsText(file);
     });
 
-    // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
