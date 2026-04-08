@@ -33,7 +33,7 @@
             display: block; background: rgba(255,255,255,0.05); color: var(--gold); 
             border: 1px solid var(--gold); padding: 15px; margin-bottom: 10px; 
             border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 0.8rem;
-            transition: 0.3s;
+            transition: 0.3s; text-transform: uppercase;
         }
         .launch-btn:hover { background: var(--gold); color: black; }
 
@@ -58,12 +58,12 @@
         <p>Select your engine components below:</p>
         
         <div id="android-tools">
-            <a href="hdo-box.apk" class="launch-btn">1. DOWNLOAD TELE-TV CORE</a>
-            <a href="mediaon-player.apk" class="launch-btn">2. DOWNLOAD DEDICATED PLAYER</a>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="launch-btn">1. Download Tele-TV Core</a>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="launch-btn">2. Download Dedicated Player</a>
         </div>
         
         <div id="tv-tools" style="display:none;">
-            <a href="https://movies7.to/" class="launch-btn">LAUNCH WEB PORTAL</a>
+            <a href="https://movies7.to/" class="launch-btn">Launch Web Portal</a>
         </div>
     </div>
     
@@ -79,25 +79,30 @@
         const statusEl = document.getElementById('status');
         
         statusEl.innerText = "Verifying Protocol...";
+        statusEl.style.color = "var(--gold)";
 
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
+                
+                // Security Check
                 if (data.handshake_protocol === "TEL-TV-77-SECURE") {
                     
-                    // Hide Auth, Show Command Center
+                    // Switch UI
                     document.getElementById('auth-ui').style.display = 'none';
                     document.getElementById('command-center').style.display = 'block';
                     statusEl.innerText = "System Synchronized";
                     statusEl.style.color = "#00ff88";
 
-                    // Device detection
+                    // Device Detection Logic
                     const isAndroid = /Android|FireCo/i.test(navigator.userAgent);
                     if (!isAndroid) {
                         document.getElementById('android-tools').style.display = 'none';
                         document.getElementById('tv-tools').style.display = 'block';
                     }
-                } else { throw new Error(); }
+                } else {
+                    throw new Error("Protocol Mismatch");
+                }
             } catch (err) {
                 statusEl.innerText = "Access Denied: Invalid Key";
                 statusEl.style.color = "#ff4444";
@@ -105,6 +110,13 @@
         };
         reader.readAsText(file);
     });
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+        });
+    }
 </script>
 </body>
 </html>
