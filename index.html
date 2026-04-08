@@ -62,7 +62,7 @@
         </div>
         
         <div id="tv-tools" style="display:none;">
-            <a href="https://fboxz.to/home" class="launch-btn">Launch Web Portal</a>
+            <a href="https://movies2watch.tv/" class="launch-btn">Launch Web Portal</a>
         </div>
     </div>
     
@@ -89,7 +89,10 @@
                     statusEl.innerText = "System Synchronized";
                     statusEl.style.color = "#00ff88";
 
-                    const isAndroid = /Android|FireCo/i.test(navigator.userAgent);
+                    // Improved Device Detection
+                    const userAgent = navigator.userAgent.toLowerCase();
+                    const isAndroid = /android|fire|sm-/.test(userAgent);
+                    
                     if (!isAndroid) {
                         document.getElementById('android-tools').style.display = 'none';
                         document.getElementById('tv-tools').style.display = 'block';
