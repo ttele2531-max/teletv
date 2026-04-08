@@ -6,17 +6,13 @@
     <title>TeleTv Pro | Secure Vault</title>
     <link rel="manifest" href="manifest.json">
     <style>
-        :root { --gold: #D4AF37; --bg: #000; }
+        :root { --gold: #D4AF37; --bg: #000; --glass: rgba(255,255,255,0.03); }
         body, html { margin: 0; padding: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100%; display: flex; justify-content: center; align-items: center; text-align: center; overflow: hidden; }
         
         .vault-card { 
-            width: 90%; 
-            max-width: 400px; 
-            padding: 50px 30px; 
-            border: 1px solid rgba(212,175,55,0.2); 
-            border-radius: 40px; 
-            background: rgba(255,255,255,0.03); 
-            backdrop-filter: blur(20px);
+            width: 90%; max-width: 400px; padding: 50px 30px; 
+            border: 1px solid rgba(212,175,55,0.2); border-radius: 40px; 
+            background: var(--glass); backdrop-filter: blur(20px);
             box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
@@ -29,7 +25,17 @@
             font-weight: 900; cursor: pointer; text-transform: uppercase; width: 100%; font-size: 0.9rem; 
             letter-spacing: 2px; transition: 0.3s; box-shadow: 0 15px 30px rgba(212,175,55,0.15);
         }
-        .sync-btn:active { transform: scale(0.98); background: #b8952e; }
+        .sync-btn:active { transform: scale(0.98); }
+
+        /* Command Center Buttons (Hidden until Sync) */
+        #command-center { display: none; margin-top: 20px; }
+        .launch-btn { 
+            display: block; background: rgba(255,255,255,0.05); color: var(--gold); 
+            border: 1px solid var(--gold); padding: 15px; margin-bottom: 10px; 
+            border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .launch-btn:hover { background: var(--gold); color: black; }
 
         #status { margin-top: 25px; font-size: 0.75rem; color: #888; text-transform: uppercase; min-height: 1.2em; }
         input[type="file"] { display: none; }
@@ -39,22 +45,32 @@
 
 <div class="vault-card">
     <img src="02_TeleTV_Logo.jpg" id="logo" alt="TeleTv Logo">
-    <h2>Vault Locked</h2>
-    <p>Hardware Security Handshake Required</p>
     
-    <input type="file" id="keyFile" accept=".json">
-    <button class="sync-btn" onclick="document.getElementById('keyFile').click()">
-        Sync NASA Key
-    </button>
+    <div id="auth-ui">
+        <h2>Vault Locked</h2>
+        <p>Hardware Security Handshake Required</p>
+        <input type="file" id="keyFile" accept=".json">
+        <button class="sync-btn" onclick="document.getElementById('keyFile').click()">Sync NASA Key</button>
+    </div>
+
+    <div id="command-center">
+        <h2 style="font-size: 1.2rem;">Access Granted</h2>
+        <p>Select your engine components below:</p>
+        
+        <div id="android-tools">
+            <a href="hdo-box.apk" class="launch-btn">1. DOWNLOAD TELE-TV CORE</a>
+            <a href="mediaon-player.apk" class="launch-btn">2. DOWNLOAD DEDICATED PLAYER</a>
+        </div>
+        
+        <div id="tv-tools" style="display:none;">
+            <a href="https://movies7.to/" class="launch-btn">LAUNCH WEB PORTAL</a>
+        </div>
+    </div>
     
     <div id="status">Awaiting D: Drive Connection...</div>
 </div>
 
 <script>
-    // --- DESTINATION CONFIGURATION ---
-    const APK_DOWNLOAD_URL = "https://github.com/ttele2531-max/teletv/raw/main/hdo-box.apk";
-    const TV_WEB_PORTAL = "https://movies7.to/"; 
-
     document.getElementById('keyFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -63,31 +79,25 @@
         const statusEl = document.getElementById('status');
         
         statusEl.innerText = "Verifying Protocol...";
-        statusEl.style.color = "var(--gold)";
 
         reader.onload = function(event) {
             try {
                 const data = JSON.parse(event.target.result);
-                
                 if (data.handshake_protocol === "TEL-TV-77-SECURE") {
-                    statusEl.innerText = "Access Granted. Syncing...";
-                    statusEl.style.color = "#00ff88";
                     
-                    // Device Detection Logic
-                    const isAndroid = /Android|FireCo/i.test(navigator.userAgent);
+                    // Hide Auth, Show Command Center
+                    document.getElementById('auth-ui').style.display = 'none';
+                    document.getElementById('command-center').style.display = 'block';
+                    statusEl.innerText = "System Synchronized";
+                    statusEl.style.color = "#00ff88";
 
-                    setTimeout(() => { 
-                        if (isAndroid) {
-                            statusEl.innerText = "Initializing Download...";
-                            window.location.href = APK_DOWNLOAD_URL;
-                        } else {
-                            statusEl.innerText = "Launching Web Vault...";
-                            window.location.href = TV_WEB_PORTAL;
-                        }
-                    }, 1500);
-                } else {
-                    throw new Error("Mismatch");
-                }
+                    // Device detection
+                    const isAndroid = /Android|FireCo/i.test(navigator.userAgent);
+                    if (!isAndroid) {
+                        document.getElementById('android-tools').style.display = 'none';
+                        document.getElementById('tv-tools').style.display = 'block';
+                    }
+                } else { throw new Error(); }
             } catch (err) {
                 statusEl.innerText = "Access Denied: Invalid Key";
                 statusEl.style.color = "#ff4444";
@@ -95,12 +105,6 @@
         };
         reader.readAsText(file);
     });
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-        });
-    }
 </script>
 </body>
 </html>
