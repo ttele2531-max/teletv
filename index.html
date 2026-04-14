@@ -8,16 +8,16 @@
         :root { --gold: #D4AF37; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 400px; width: 90%; backdrop-filter: blur(10px); }
-        h1 { color: var(--gold); letter-spacing: 2px; }
-        .btn { display: inline-block; background: var(--gold); color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; border: none; }
+        h1 { color: var(--gold); letter-spacing: 2px; font-weight: 300; }
+        .btn { display: inline-block; background: var(--gold); color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; border: none; font-size: 0.9rem; }
         input[type="file"] { display: none; }
     </style>
 </head>
 <body>
     <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 120px; margin-bottom: 20px;">
+        <img src="02_TeleTV_Logo.jpg" style="width: 120px; margin-bottom: 20px;" alt="TeleTv Logo">
         <h1>VAULT LOCKED</h1>
-        <p style="color: #888;">Sync Handshake Key to proceed.</p>
+        <p style="color: #888;">Sync NASA Key to proceed.</p>
         <label for="key-upload" class="btn" id="main-btn">SYNC NASA KEY</label>
         <input type="file" id="key-upload" accept=".json">
     </div>
@@ -33,24 +33,19 @@
             reader.onload = function(event) {
                 try {
                     const keyData = JSON.parse(event.target.result);
-                    
-                    // DEBUG: This tells us exactly what is inside your file
-                    console.log("File Content:", keyData);
-
-                    // OVERRIDE: If the file has ANY data at all, let's try to let it in
-                    if (keyData.protocol) {
+                    // Checking for protocol match (case-insensitive)
+                    if (keyData.protocol && keyData.protocol.toUpperCase().includes("TEL-TV")) {
                         mainBtn.innerHTML = "ACCESS GRANTED";
                         mainBtn.style.background = "#00ff00";
-
                         setTimeout(() => {
-                            // Using window.location.replace is "stronger" than .href
+                            // Using location.replace prevents back-button loops
                             window.location.replace("setup.html");
-                        }, 500);
+                        }, 800);
                     } else {
-                        alert("FILE ERROR: Your .json file is missing the 'protocol' line.");
+                        alert("INVALID KEY: Protocol Mismatch");
                     }
                 } catch (err) {
-                    alert("JSON FORMAT ERROR: Check for missing quotes or commas in your file.");
+                    alert("FILE ERROR: Please upload a valid NASA Key (.json)");
                 }
             };
             reader.readAsText(file);
