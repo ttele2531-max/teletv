@@ -3,53 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTv | Secure Vault</title>
+    <title>TeleTv | System Setup</title>
     <style>
         :root { --gold: #D4AF37; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 400px; width: 90%; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        h1 { color: var(--gold); letter-spacing: 2px; font-weight: 300; margin-bottom: 10px; }
-        .btn { display: inline-block; background: var(--gold); color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; border: none; transition: 0.3s; }
-        .btn:hover { transform: scale(1.05); background: #f1c40f; }
-        input[type="file"] { display: none; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; backdrop-filter: blur(15px); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        h1 { color: var(--gold); letter-spacing: 2px; margin-bottom: 30px; font-weight: 300; text-transform: uppercase; }
+        .step { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 18px; margin-bottom: 20px; border-left: 4px solid var(--gold); text-align: left; }
+        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 12px; display: block; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .btn { 
+            display: block; 
+            background: var(--gold); 
+            color: black; 
+            text-decoration: none; 
+            padding: 15px; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            margin-top: 10px; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            width: 100%; 
+            text-align: center; 
+            box-sizing: border-box; 
+            border: none; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+        }
+        .btn:hover { background: #f1c40f; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
+        .web-btn { background: white !important; color: black !important; }
     </style>
 </head>
 <body>
+
     <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 130px; margin-bottom: 20px;" alt="TeleTv">
-        <h1>VAULT LOCKED</h1>
-        <p style="color: #666; font-size: 0.9rem;">Sync NASA Key to establish handshake.</p>
-        <label for="key-upload" class="btn" id="main-btn">SYNC NASA KEY</label>
-        <input type="file" id="key-upload" accept=".json">
+        <img src="02_TeleTV_Logo.jpg" style="width: 160px; margin-bottom: 20px;" alt="TeleTv Logo">
+        <h1>Complete Setup</h1>
+        
+        <div class="step">
+            <span class="step-title">1. Android & Fire Stick</span>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="btn">Download HDO Core</a>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="btn" style="margin-top:12px;">Download Player</a>
+        </div>
+
+        <div class="step">
+            <span class="step-title">2. Smart TV & Laptop Engine</span>
+            <button onclick="launchEngine()" class="btn web-btn">Launch Web Engine</button>
+        </div>
+
+        <p style="color: #444; font-size: 0.65rem; margin-top: 25px; letter-spacing: 2px;">SECURE TERMINAL | PORT 8080 ACTIVE</p>
     </div>
 
     <script>
-        const keyUpload = document.getElementById('key-upload');
-        const mainBtn = document.getElementById('main-btn');
-
-        keyUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(event) {
-                try {
-                    const keyData = JSON.parse(event.target.result);
-                    // Validates key if it contains the "TEL-TV" protocol
-                    if (keyData.protocol && keyData.protocol.toUpperCase().includes("TEL-TV")) {
-                        mainBtn.innerHTML = "ACCESS GRANTED";
-                        mainBtn.style.background = "#2ecc71";
-                        setTimeout(() => {
-                            window.location.replace("setup.html");
-                        }, 800);
-                    } else {
-                        alert("INVALID KEY: Protocol check failed.");
-                    }
-                } catch (err) {
-                    alert("ERROR: File is not a valid NASA Key (.json)");
-                }
-            };
-            reader.readAsText(file);
-        });
+        function launchEngine() {
+            // Using window.location.assign forces the browser to exit the current domain
+            // This prevents the '404 Not Found' error by ensuring it doesn't stay on GitHub
+            window.location.assign('https://hdo.app/tv');
+        }
     </script>
+
 </body>
 </html>
