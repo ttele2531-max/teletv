@@ -7,17 +7,18 @@
     <style>
         :root { --gold: #D4AF37; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 400px; width: 90%; backdrop-filter: blur(10px); }
-        h1 { color: var(--gold); letter-spacing: 2px; font-weight: 300; }
-        .btn { display: inline-block; background: var(--gold); color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; border: none; font-size: 0.9rem; }
+        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 400px; width: 90%; backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        h1 { color: var(--gold); letter-spacing: 2px; font-weight: 300; margin-bottom: 10px; }
+        .btn { display: inline-block; background: var(--gold); color: black; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; text-transform: uppercase; border: none; transition: 0.3s; }
+        .btn:hover { transform: scale(1.05); background: #f1c40f; }
         input[type="file"] { display: none; }
     </style>
 </head>
 <body>
     <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 120px; margin-bottom: 20px;" alt="TeleTv Logo">
+        <img src="02_TeleTV_Logo.jpg" style="width: 130px; margin-bottom: 20px;" alt="TeleTv">
         <h1>VAULT LOCKED</h1>
-        <p style="color: #888;">Sync NASA Key to proceed.</p>
+        <p style="color: #666; font-size: 0.9rem;">Sync NASA Key to establish handshake.</p>
         <label for="key-upload" class="btn" id="main-btn">SYNC NASA KEY</label>
         <input type="file" id="key-upload" accept=".json">
     </div>
@@ -33,19 +34,18 @@
             reader.onload = function(event) {
                 try {
                     const keyData = JSON.parse(event.target.result);
-                    // Checking for protocol match (case-insensitive)
+                    // Validates key if it contains the "TEL-TV" protocol
                     if (keyData.protocol && keyData.protocol.toUpperCase().includes("TEL-TV")) {
                         mainBtn.innerHTML = "ACCESS GRANTED";
-                        mainBtn.style.background = "#00ff00";
+                        mainBtn.style.background = "#2ecc71";
                         setTimeout(() => {
-                            // Using location.replace prevents back-button loops
                             window.location.replace("setup.html");
                         }, 800);
                     } else {
-                        alert("INVALID KEY: Protocol Mismatch");
+                        alert("INVALID KEY: Protocol check failed.");
                     }
                 } catch (err) {
-                    alert("FILE ERROR: Please upload a valid NASA Key (.json)");
+                    alert("ERROR: File is not a valid NASA Key (.json)");
                 }
             };
             reader.readAsText(file);
