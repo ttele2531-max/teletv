@@ -7,31 +7,63 @@
     <style>
         :root { --gold: #D4AF37; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; backdrop-filter: blur(10px); }
-        h1 { color: var(--gold); letter-spacing: 2px; margin-bottom: 30px; }
+        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; backdrop-filter: blur(10px); box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+        h1 { color: var(--gold); letter-spacing: 2px; margin-bottom: 30px; font-weight: 300; }
         .step { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--gold); text-align: left; }
-        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 10px; display: block; font-size: 0.8rem; letter-spacing: 1px; }
-        .action-link { display: block; background: var(--gold); color: black; text-decoration: none; padding: 14px; border-radius: 50px; font-weight: bold; margin-top: 10px; font-size: 0.85rem; text-transform: uppercase; width: 100%; text-align: center; box-sizing: border-box; transition: 0.3s; }
-        .action-link:hover { background: #f1c40f; }
+        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 10px; display: block; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+        
+        /* The Button Styling */
+        .action-link { 
+            display: block; 
+            background: var(--gold); 
+            color: black; 
+            text-decoration: none; 
+            padding: 14px; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            margin-top: 10px; 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            width: 100%; 
+            text-align: center; 
+            box-sizing: border-box; 
+            transition: transform 0.2s, background 0.2s;
+            border: none;
+        }
+        .action-link:hover { transform: scale(1.02); background: #f1c40f; }
+        .web-engine { background: white !important; }
     </style>
 </head>
 <body>
+
     <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 150px; margin-bottom: 20px;" alt="TeleTv">
-        <h1>Complete Setup</h1>
+        <img src="02_TeleTV_Logo.jpg" style="width: 150px; margin-bottom: 20px;" alt="TeleTv Logo">
+        <h1>System Setup</h1>
         
         <div class="step">
-            <span class="step-title">1. MOBILE & STREAMING STICKS</span>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="action-link">Download HDO Core</a>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="action-link" style="margin-top:10px;">Download Player</a>
+            <span class="step-title">Mobile & Streaming Sticks</span>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="action-link">1. Download HDO Core</a>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="action-link" style="margin-top:10px;">2. Download Player</a>
         </div>
 
         <div class="step">
-            <span class="step-title">2. SMART TV & LAPTOP ENGINE</span>
-            <a href="https://hdo.app/tv" target="_blank" class="action-link" style="background: white;">Launch Web Engine</a>
+            <span class="step-title">Smart TV & Laptop Engine</span>
+            <a href="https://hdo.app/tv" target="_blank" rel="noopener noreferrer" class="action-link web-engine">Launch Web Engine</a>
         </div>
 
-        <p style="color: #444; font-size: 0.7rem; margin-top: 20px;">SYSTEM STATUS: SECURE & OPERATIONAL</p>
+        <p style="color: #444; font-size: 0.65rem; margin-top: 20px; letter-spacing: 1px;">ENCRYPTED TERMINAL v1.0.2</p>
     </div>
+
+    <script>
+        // Force the page to refresh its data every time it loads 
+        // This prevents the "Looking for files" ghost error
+        window.onload = function() {
+            if(!window.location.hash) {
+                window.location = window.location + '#loaded';
+                window.location.reload();
+            }
+        }
+    </script>
+
 </body>
 </html>
