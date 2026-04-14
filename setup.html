@@ -8,29 +8,30 @@
         :root { --gold: #D4AF37; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
         .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; backdrop-filter: blur(10px); }
-        h1 { color: var(--gold); letter-spacing: 2px; }
+        h1 { color: var(--gold); letter-spacing: 2px; margin-bottom: 30px; }
         .step { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 4px solid var(--gold); text-align: left; }
-        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 5px; display: block; }
-        .download-btn { display: inline-block; background: var(--gold); color: black; text-decoration: none; padding: 12px 25px; border-radius: 50px; font-weight: bold; margin-top: 10px; font-size: 0.8rem; text-transform: uppercase; width: 100%; text-align: center; box-sizing: border-box; border: none; cursor: pointer; }
+        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 10px; display: block; font-size: 0.8rem; letter-spacing: 1px; }
+        .action-link { display: block; background: var(--gold); color: black; text-decoration: none; padding: 14px; border-radius: 50px; font-weight: bold; margin-top: 10px; font-size: 0.85rem; text-transform: uppercase; width: 100%; text-align: center; box-sizing: border-box; transition: 0.3s; }
+        .action-link:hover { background: #f1c40f; }
     </style>
 </head>
 <body>
     <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 150px; margin-bottom: 20px;" alt="TeleTv Logo">
+        <img src="02_TeleTV_Logo.jpg" style="width: 150px; margin-bottom: 20px;" alt="TeleTv">
         <h1>Complete Setup</h1>
         
         <div class="step">
-            <span class="step-title">ANDROID / FIRE STICK</span>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="download-btn">1. Download HDO Core</a>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="download-btn" style="margin-top:10px;">2. Download Player</a>
+            <span class="step-title">1. MOBILE & STREAMING STICKS</span>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="action-link">Download HDO Core</a>
+            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="action-link" style="margin-top:10px;">Download Player</a>
         </div>
 
         <div class="step">
-            <span class="step-title">SAMSUNG / LG / LAPTOP</span>
-            <button onclick="window.location.href='https://hdo.app/tv'" class="download-btn" style="background: white;">Launch Web Engine</button>
+            <span class="step-title">2. SMART TV & LAPTOP ENGINE</span>
+            <a href="https://hdo.app/tv" target="_blank" class="action-link" style="background: white;">Launch Web Engine</a>
         </div>
 
-        <p style="color: #444; font-size: 0.7rem;">SYSTEM STATUS: ENCRYPTED</p>
+        <p style="color: #444; font-size: 0.7rem; margin-top: 20px;">SYSTEM STATUS: SECURE & OPERATIONAL</p>
     </div>
 </body>
 </html>
