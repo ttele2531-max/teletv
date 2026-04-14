@@ -4,136 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeleTv Pro | Secure Vault</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        :root { --gold: #D4AF37; --dark: #0a0a0a; --glass: rgba(255, 255, 255, 0.05); }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
-        .vault-container { width: 90%; max-width: 800px; padding: 40px 20px; text-align: center; }
-        .logo { width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--gold)); }
-        
-        /* Glassmorphism UI */
-        .glass-panel { background: var(--glass); border: 1px solid rgba(255,215,0,0.2); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        .btn { background: var(--gold); color: black; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; transition: 0.3s; text-decoration: none; display: inline-block; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold); }
-        
-        /* Movie Engine Grid */
-        #movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; margin-top: 30px; }
-        .movie-card { transition: 0.3s; cursor: pointer; border-radius: 12px; overflow: hidden; border: 1px solid transparent; }
-        .movie-card:hover { transform: translateY(-5px); border-color: var(--gold); }
-        .movie-card img { width: 100%; display: block; }
-        
-        /* Video Overlays */
-        #player-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; display: none; }
-        iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: absolute; top: 20px; right: 20px; background: red; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; z-index: 1001; }
-
-        .hidden { display: none !important; }
+        :root { --gold: #D4AF37; --dark: #0a0a0a; }
+        body { background: var(--dark); color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .glass { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 15px; padding: 20px; max-width: 500px; margin: auto; }
+        .logo { width: 150px; margin-bottom: 20px; }
+        .btn { background: var(--gold); color: black; padding: 15px 25px; border-radius: 50px; text-decoration: none; display: block; margin: 10px auto; font-weight: bold; width: 80%; border: none; cursor: pointer; }
+        .hidden { display: none; }
         input[type="file"] { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="vault-container">
-        <img src="02_TeleTV_Logo.jpg" alt="TeleTv" class="logo">
-        
-        <div id="auth-section" class="glass-panel">
-            <h1 style="color: var(--gold); letter-spacing: 2px;">VAULT LOCKED</h1>
-            <p>Sync NASA Key to Ignite Engine</p>
-            <label for="key-upload" class="btn">SYNC KEY</label>
-            <input type="file" id="key-upload" accept=".json">
-        </div>
+    <img src="02_TeleTV_Logo.jpg" class="logo">
 
-        <div id="command-center" class="glass-panel hidden">
-            <h2 style="color: var(--gold);">ACCESS GRANTED</h2>
-            
-            <div id="download-zone">
-                <p>Android/FireStick Downloads:</p>
-                <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="btn" style="font-size: 0.8rem;">HDO CORE</a>
-                <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="btn" style="font-size: 0.8rem;">PLAYER</a>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid rgba(255,215,0,0.2); margin: 30px 0;">
-            
-            <h3 style="color: var(--gold);">WEB ENGINE (SAMSUNG/LG)</h3>
-            <div id="movie-grid">
-                <p>Priming HDO Stream Links...</p>
-            </div>
-        </div>
+    <div id="auth-box" class="glass">
+        <h2 style="color: var(--gold);">VAULT LOCKED</h2>
+        <p>Sync NASA Key to Proceed</p>
+        <label for="key-upload" class="btn">SYNC KEY</label>
+        <input type="file" id="key-upload" accept=".json">
     </div>
 
-    <div id="player-overlay">
-        <button class="close-btn" onclick="closePlayer()">EXIT MOVIE</button>
-        <iframe id="main-player" src="" allowfullscreen></iframe>
+    <div id="command-center" class="glass hidden">
+        <h2 style="color: var(--gold);">ACCESS GRANTED</h2>
+        
+        <p><strong>ANDROID / FIRE STICK:</strong></p>
+        <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="btn">DOWNLOAD HDO CORE</a>
+        
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+
+        <p><strong>SAMSUNG / LG / WEB:</strong></p>
+        <p style="font-size: 0.8rem;">Click below to launch the Web Engine directly.</p>
+        <button onclick="launchWeb()" class="btn" style="background: #fff;">LAUNCH WEB PLAYER</button>
     </div>
 
     <script>
         const keyUpload = document.getElementById('key-upload');
-        const authSection = document.getElementById('auth-section');
+        const authBox = document.getElementById('auth-box');
         const commandCenter = document.getElementById('command-center');
-        const movieGrid = document.getElementById('movie-grid');
 
-        // Handshake Protocol
         keyUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = function(event) {
                 try {
                     const keyData = JSON.parse(event.target.result);
+                    // Checking for your specific protocol
                     if (keyData.protocol === "TEL-TV-77-SECURE") {
-                        authSection.classList.add('hidden');
+                        authBox.classList.add('hidden');
                         commandCenter.classList.remove('hidden');
-                        loadHdoWebEngine();
                     } else {
-                        alert("INVALID HANDSHAKE KEY");
+                        alert("INVALID KEY");
                     }
                 } catch (err) {
-                    alert("KEY CORRUPTION DETECTED");
+                    alert("FILE ERROR");
                 }
             };
             reader.readAsText(file);
         });
 
-        // Web Engine Logic extracted from index.android.bundle
-        async function loadHdoWebEngine() {
-            const BANNER_URL = 'https://raw.githubusercontent.com/hdoonline/hdotv/refs/heads/main/banner.json';
-            const IMG_BASE = 'https://image.tmdb.org/t/p/w500';
-
-            try {
-                const response = await fetch(BANNER_URL);
-                const data = await response.json();
-                movieGrid.innerHTML = ''; 
-
-                data.forEach(movie => {
-                    const card = document.createElement('div');
-                    card.className = 'movie-card';
-                    card.innerHTML = `
-                        <img src="${IMG_BASE}${movie.poster_path}" alt="${movie.title || movie.name}">
-                        <p style="font-size: 0.75rem; margin-top: 8px;">${movie.title || movie.name}</p>
-                    `;
-                    card.onclick = () => openStream(movie.id, movie.media_type);
-                    movieGrid.appendChild(card);
-                });
-            } catch (err) {
-                movieGrid.innerHTML = '<p style="color:red;">WEB ENGINE TIMEOUT</p>';
-            }
-        }
-
-        function openStream(id, type) {
-            const overlay = document.getElementById('player-overlay');
-            const iframe = document.getElementById('main-player');
-            // This source acts as the web-equivalent of the HDO Box scraper
-            const streamUrl = `https://vidsrc.me/embed/${type === 'tv' ? 'tv' : 'movie'}?tmdb=${id}`;
-            
-            iframe.src = streamUrl;
-            overlay.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
-        }
-
-        function closePlayer() {
-            document.getElementById('player-overlay').style.display = 'none';
-            document.getElementById('main-player').src = '';
-            document.body.style.overflow = 'auto';
+        function launchWeb() {
+            // This is the direct Web Version of HDO Box. 
+            // It works on Samsung/LG browsers perfectly.
+            window.open('https://hdo.app/tv', '_blank');
         }
     </script>
 </body>
