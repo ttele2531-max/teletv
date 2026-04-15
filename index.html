@@ -3,64 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTv | System Setup</title>
+    <title>TeleTV | Web Access</title>
     <style>
-        :root { --gold: #D4AF37; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; backdrop-filter: blur(15px); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        h1 { color: var(--gold); letter-spacing: 2px; margin-bottom: 30px; font-weight: 300; text-transform: uppercase; }
-        .step { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 18px; margin-bottom: 20px; border-left: 4px solid var(--gold); text-align: left; }
-        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 12px; display: block; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
-        
-        .btn { 
-            display: block; 
-            background: var(--gold); 
-            color: black; 
-            text-decoration: none; 
-            padding: 15px; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            margin-top: 10px; 
-            font-size: 0.85rem; 
-            text-transform: uppercase; 
-            width: 100%; 
-            text-align: center; 
-            box-sizing: border-box; 
-            border: none; 
-            cursor: pointer; 
-            transition: all 0.3s ease;
+        :root { --gold: #D4AF37; --bg: #000000; --panel: #0a0a0a; }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            overflow: hidden;
         }
-        .btn:hover { background: #f1c40f; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.3); }
-        .web-btn { background: white !important; color: black !important; }
+        
+        .terminal-card { 
+            background: var(--panel); 
+            border: 1px solid #222; 
+            border-radius: 20px; 
+            padding: 60px 40px; 
+            text-align: center; 
+            width: 400px; 
+            box-shadow: 0 40px 100px rgba(0,0,0,0.9);
+            transition: border 0.3s ease;
+        }
+
+        .logo-area img { 
+            width: 200px; 
+            margin-bottom: 40px; 
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.2));
+        }
+
+        h1 { 
+            font-size: 1rem; 
+            letter-spacing: 5px; 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+        
+        .input-container { margin-bottom: 30px; }
+        
+        input { 
+            width: 100%; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid #333; 
+            background: #000; 
+            color: white; 
+            text-align: center; 
+            font-size: 1.3rem;
+            letter-spacing: 4px;
+            box-sizing: border-box;
+            outline: none;
+            text-transform: uppercase;
+        }
+        input:focus { border-color: var(--gold); }
+
+        .auth-btn { 
+            width: 100%; 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: none; 
+            background: var(--gold); 
+            color: black;
+            font-weight: 900; 
+            text-transform: uppercase; 
+            letter-spacing: 3px;
+            cursor: pointer; 
+            transition: background 0.2s, transform 0.1s;
+        }
+        .auth-btn:active { transform: scale(0.98); }
+        .auth-btn:hover { background: #fff; }
+
+        .error-msg { 
+            color: #ff4444; 
+            font-size: 0.8rem; 
+            margin-top: 25px; 
+            display: none; 
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        
+        .version { 
+            margin-top: 50px; 
+            font-size: 0.6rem; 
+            color: #222; 
+            letter-spacing: 3px; 
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 160px; margin-bottom: 20px;" alt="TeleTv Logo">
-        <h1>Complete Setup</h1>
+    <div class="terminal-card" id="gate">
+        <div class="logo-area">
+            <img src="02_TeleTV_Logo.jpg" alt="TeleTV">
+        </div>
         
-        <div class="step">
-            <span class="step-title">1. Android & Fire Stick</span>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="btn">Download HDO Core</a>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/mediaon-player.apk" class="btn" style="margin-top:12px;">Download Player</a>
+        <h1>System Authorization</h1>
+        
+        <div class="input-container">
+            <input type="text" id="passkey" placeholder="XXXX-000-XX" spellcheck="false" autocomplete="off">
         </div>
 
-        <div class="step">
-            <span class="step-title">2. Smart TV & Laptop Engine</span>
-            <button onclick="launchEngine()" class="btn web-btn">Launch Web Engine</button>
-        </div>
+        <button class="auth-btn" onclick="authorize()">Initiate Handshake</button>
+        
+        <div id="error" class="error-msg"></div>
 
-        <p style="color: #444; font-size: 0.65rem; margin-top: 25px; letter-spacing: 2px;">SECURE TERMINAL | PORT 8080 ACTIVE</p>
+        <div class="version">TELETV_WEB_CORE_V2.6</div>
     </div>
 
     <script>
-        function launchEngine() {
-            // Using window.location.assign forces the browser to exit the current domain
-            // This prevents the '404 Not Found' error by ensuring it doesn't stay on GitHub
-            window.location.assign('https://hdo.app/tv');
-        }
-    </script>
+        function authorize() {
+            const field = document.getElementById('passkey');
+            const key = field.value.trim();
+            const error = document.getElementById('error');
+            const card = document.getElementById('gate');
+            
+            // --- MASTER BYPASS: PERSONAL ACCESS ---
+            if (key === "TTeletv77") {
+                sessionStorage.setItem('tele_auth', 'active');
+                window.location.href = "setup.html";
+                return;
+            }
 
+            const input = key.toUpperCase();
+            const segments = input.split('-');
+            
+            // --- FORMAT VALIDATION ---
+            if (segments.length !== 3) {
+                showError("INVALID KEY FORMAT");
+                return;
+            }
+
+            const prefix = segments[0];
+            const serial = parseInt(segments[1]);
+            const suffix = segments[2];
+
+            // --- 500-USER ROTATION LOGIC ---
+            const preList = ["SR18", "QG15", "GA16", "RB20", "EJ15", "DB15", "2JZ"];
+            const sufList = ["JF", "KE", "HY", "WQ", "TR"];
+
+            const targetPre = preList[(serial - 1) % 7];
+            const targetSuf = sufList[(serial - 1) % 5];
+
+            // --- AUTH & HARDWARE LOCK ---
+            if (serial >= 1 && serial <= 500 && prefix === targetPre && suffix === targetSuf) {
+                const hardwareBinding = localStorage.getItem('teletv_hw_id');
+
+                if (!hardwareBinding || hardwareBinding === input) {
+                    // Success: Bind key to this TV's Local Storage
+                    localStorage.setItem('teletv_hw_id', input);
+                    sessionStorage.setItem('tele_auth', 'active');
+                    window.location.href = "setup.html";
+                } else {
+                    showError("KEY BOUND TO OTHER HARDWARE");
+                }
+            } else {
+                showError("ACCESS DENIED");
+            }
+        }
+
+        function showError(msg) {
+            const error = document.getElementById('error');
+            error.innerText = msg;
+            error.style.display = "block";
+            
+            // Red flash for TV feedback
+            document.getElementById('gate').style.borderColor = "#ff4444";
+            setTimeout(() => { document.getElementById('gate').style.borderColor = "#222"; }, 1500);
+        }
+
+        // Listen for Remote Control 'OK' or 'Enter'
+        document.getElementById('passkey').addEventListener("keypress", function(e) {
+            if (e.key === "Enter") authorize();
+        });
+    </script>
 </body>
 </html>
