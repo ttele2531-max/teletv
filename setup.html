@@ -3,166 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTV | Web Interface</title>
+    <title>TeleTV Core | System Setup</title>
     <style>
         :root { --accent: #D4AF37; --bg: #000; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: white; overflow: hidden; font-family: sans-serif; }
         
-        body, html { 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: var(--bg); 
-            color: white; 
-            overflow: hidden; 
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; 
-        }
-
-        #tele-viewport {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: #000;
-            position: relative;
-        }
-
-        /* Loading Screen matching the Bundle's progress logic */
+        /* 360px Loading Bar - Matched to index.android.bundle logic */
         #loader {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 1000;
         }
+        .progress-container { width: 360px; height: 8px; background: #333; border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.4s ease; }
 
-        #loader img { width: 220px; margin-bottom: 30px; }
+        /* Video Container */
+        #video-viewport { width: 100%; height: 100vh; display: none; background: #000; }
+        video { width: 100%; height: 100%; }
 
-        .progress-container { width: 360px; height: 8px; background: #222; border-radius: 10px; overflow: hidden; }
-        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s; }
-
-        /* Video Player Styling */
-        #video-container { width: 100%; height: 100%; display: none; }
-        video { width: 100%; height: 100%; object-fit: contain; } /* 'contain' matches bundle resizeMode */
-
-        /* Overlay UI extracted from bundle styles */
-        .overlay {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            pointer-events: none;
+        /* System Overlay Styles */
+        .status-header {
+            position: absolute; top: 30px; left: 30px;
+            padding: 10px 15px; border-left: 2px solid var(--accent);
+            background: rgba(0,0,0,0.5); font-size: 0.9rem; letter-spacing: 1px;
         }
-
-        .status-badge {
-            background: rgba(212, 175, 55, 0.1);
-            border-left: 3px solid var(--accent);
-            padding: 10px 20px;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .exit-link {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            color: #444;
-            text-decoration: none;
-            font-size: 0.7rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            z-index: 110;
-        }
-        .exit-link:hover { color: var(--accent); }
-
     </style>
 </head>
 <body>
 
-    <div id="tele-viewport">
-        
-        <div id="loader">
-            <img src="02_TeleTV_Logo.jpg" alt="TeleTV">
-            <div class="progress-container">
-                <div id="bar" class="progress-bar"></div>
-            </div>
-            <p id="status-text" style="margin-top:15px; font-size:0.7rem; color:#444; letter-spacing:2px;">INITIATING CORE...</p>
+    <div id="loader">
+        <img src="02_TeleTV_Logo.jpg" style="width: 200px;">
+        <div class="progress-container">
+            <div id="fill" class="progress-bar"></div>
         </div>
-
-        <div id="video-container">
-            <div class="overlay">
-                <div class="status-badge">System Online // Web-App Stream</div>
-            </div>
-            
-            <video id="main-player" poster="02_TeleTV_Logo.jpg" autoplay controls>
-                <source src="YOUR_M3U8_STREAM_URL_HERE" type="application/x-mpegURL">
-                Your browser does not support high-definition streaming.
-            </video>
-        </div>
-
+        <p id="load-text" style="font-size: 0.7rem; color: #666; margin-top: 10px;">MOUNTING RCT_VIDEO_BRIDGE...</p>
     </div>
 
-    <div class="exit-link" onclick="logout()">Terminate Session</div>
+    <div id="video-viewport">
+        <div class="status-header">SYSTEM ONLINE // LIVE_FEED</div>
+        <video id="tv-player" controls autoplay poster="02_TeleTV_Logo.jpg">
+            <source src="INSERT_YOUR_STREAM_URL_HERE" type="application/x-mpegURL">
+        </video>
+    </div>
 
     <script>
-        // 1. SECURITY CHECK (Immediate)
-        if (sessionStorage.getItem('tele_auth') !== 'active') {
-            window.location.href = "index.html";
-        }
+        // Security Check
+        if (sessionStorage.getItem('tele_auth') !== 'active') { window.location.href = "index.html"; }
 
-        // 2. BUNDLE LOGIC EMULATION
+        // Boot Sequence logic emulating the bundle's initialization
         window.onload = function() {
-            const bar = document.getElementById('bar');
-            const status = document.getElementById('status-text');
-            const loader = document.getElementById('loader');
-            const playerDiv = document.getElementById('video-container');
-            
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 20;
-                if (progress > 100) progress = 100;
-                
-                bar.style.width = progress + "%";
-                
-                if (progress < 40) status.innerText = "PARSING BUNDLE...";
-                else if (progress < 80) status.innerText = "FETCHING LICENSE...";
-                else status.innerText = "DECODING STREAM...";
+            const fill = document.getElementById('fill');
+            const text = document.getElementById('load-text');
+            let p = 0;
 
-                if (progress >= 100) {
-                    clearInterval(interval);
+            const boot = setInterval(() => {
+                p += Math.floor(Math.random() * 15) + 5;
+                if (p > 100) p = 100;
+                fill.style.width = p + "%";
+
+                if (p > 80) text.innerText = "HANDSHAKING API...";
+                else if (p > 40) text.innerText = "DECODING MANIFEST...";
+
+                if (p === 100) {
+                    clearInterval(boot);
                     setTimeout(() => {
-                        loader.style.display = 'none';
-                        playerDiv.style.display = 'block';
-                        console.log("TeleTV Engine: RCTVideo Bridge Active");
-                    }, 500);
+                        document.getElementById('loader').style.display = 'none';
+                        document.getElementById('video-viewport').style.display = 'block';
+                    }, 800);
                 }
-            }, 300);
+            }, 250);
         };
 
-        // 3. LOGOUT & SESSION CLEAR
-        function logout() {
-            sessionStorage.removeItem('tele_auth');
-            window.location.href = "index.html";
-        }
-
-        // 4. TV REMOTE OPTIMIZATION (BETA)
-        // Helps Samsung/LG remotes handle the player UI
-        document.addEventListener('keydown', function(e) {
-            const video = document.getElementById('main-player');
-            switch(e.keyCode) {
-                case 13: // Enter/OK
-                    video.paused ? video.play() : video.pause();
-                    break;
-                case 415: // Play
-                    video.play();
-                    break;
-                case 19: // Pause
-                    video.pause();
-                    break;
-            }
+        // TV Remote Navigation (Handling Enter, Play, Pause)
+        document.addEventListener('keydown', (e) => {
+            const v = document.getElementById('tv-player');
+            if (e.keyCode === 13 || e.keyCode === 415) v.play(); // Enter or Play
+            if (e.keyCode === 19) v.pause(); // Pause
         });
     </script>
 </body>
