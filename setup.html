@@ -3,45 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleTv | System Setup</title>
+    <title>TeleTV | System Dashboard</title>
     <style>
-        :root { --gold: #D4AF37; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 40px; text-align: center; max-width: 500px; width: 100%; backdrop-filter: blur(15px); box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-        h1 { color: var(--gold); letter-spacing: 2px; margin-bottom: 30px; font-weight: 300; }
-        .step { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 18px; margin-bottom: 20px; border-left: 4px solid var(--gold); text-align: left; }
-        .step-title { color: var(--gold); font-weight: bold; margin-bottom: 12px; display: block; font-size: 0.75rem; text-transform: uppercase; }
-        .btn { display: block; background: var(--gold); color: black; text-decoration: none; padding: 15px; border-radius: 50px; font-weight: bold; margin-top: 10px; font-size: 0.85rem; text-transform: uppercase; width: 100%; text-align: center; box-sizing: border-box; border: none; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #f1c40f; transform: scale(1.02); }
+        :root { --accent: #D4AF37; --bg: #000; }
+        
+        /* Forces the web-app to feel like a native TV app */
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--bg); 
+            color: white; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', sans-serif; 
+        }
+
+        /* Container for your decompiled app modules */
+        #tele-viewport {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .status-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        .app-load-screen {
+            text-align: center;
+        }
+
+        .app-load-screen img {
+            width: 180px;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 2px;
+            background: #111;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            width: 40%;
+            height: 100%;
+            background: var(--accent);
+            position: absolute;
+            animation: move 2s infinite linear;
+        }
+
+        @keyframes move {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        /* Exit button for session termination */
+        .exit-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: transparent;
+            color: #222;
+            border: 1px solid #222;
+            padding: 8px 15px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+        .exit-btn:hover { color: var(--accent); border-color: var(--accent); }
+
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <img src="02_TeleTV_Logo.jpg" style="width: 160px; margin-bottom: 20px;" alt="TeleTv">
-        <h1>Complete Setup</h1>
-        
-        <div class="step">
-            <span class="step-title">1. Android & Fire Stick</span>
-            <a href="https://github.com/ttele2531-max/teletv/releases/download/v1.01/hdo-box.apk" class="btn">Download HDO Core</a>
+    <div class="status-header">Auth Verified // Web-App Mode</div>
+
+    <div id="tele-viewport">
+        <div class="app-load-screen" id="loader">
+            <img src="02_TeleTV_Logo.jpg" alt="TeleTV">
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
         </div>
 
-        <div class="step">
-            <span class="step-title">2. Smart TV & Laptop Engine</span>
-            <button onclick="forceWebLaunch()" class="btn" style="background: white;">Launch Web Engine</button>
-        </div>
-
-        <p style="color: #444; font-size: 0.6rem; margin-top: 25px;">SECURE TERMINAL | REFRESHED SIGNAL</p>
+        <div id="main-app-content"></div>
     </div>
 
-    <script>
-        function forceWebLaunch() {
-            // We add a random number (?v=...) to the end. 
-            // This stops the browser from using its "Memory" of the old APK download.
-            var cacheBuster = Math.random();
-            window.location.href = "https://hdo.app/tv?v=" + cacheBuster;
-        }
-    </script>
+    <button class="exit-btn" onclick="terminate()">Terminate Session</button>
 
+    <script>
+        // --- 1. THE SECURITY LOCK ---
+        // If someone types this URL directly, boot them back to the gate.
+        if (sessionStorage.getItem('tele_auth') !== 'active') {
+            window.location.href = "index.html";
+        }
+
+        // --- 2. SESSION CONTROL ---
+        function terminate() {
+            sessionStorage.removeItem('tele_auth');
+            window.location.href = "index.html";
+        }
+
+        // --- 3. DECOMPILED LOGIC INITIALIZATION ---
+        window.onload = function() {
+            console.log("TeleTV Engine: Loading Modules...");
+            
+            // This is where you will add the functions to trigger 
+            // your decompiled JS (e.g., initTelePlayer();)
+            
+            // Example of removing loader after 'app' ready
+            setTimeout(() => {
+                // document.getElementById('loader').style.display = 'none';
+                console.log("TeleTV Engine: Ready for Input.");
+            }, 3000);
+        };
+    </script>
 </body>
 </html>
